@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------------Зависимости
-.PHONY: all rebuild build run clean clang config push cpp leaks valgrind s21_cat s21_grep
+.PHONY: all rebuild build run clean clang config push cpp leaks valgrind s21_cat s21_grep test_cat clean_cat
 
 # --------------------------------------------------------------------------Переменные (общие)
 SHELL := /bin/bash
@@ -102,10 +102,11 @@ clean:
 clang:
 	@cp ../materials/linters/.clang-format .clang-format
 	@echo "Файл clang-format скопирован в папку src."
-#	@clang-format -n $(C_FILES) $(H_FILES)
-#	@clang-format -i $(C_FILES) $(H_FILES)
-	@clang-format -n **/*.c **/*.h
-	@clang-format -i **/*.c **/*.h
+	@if [ -n "$$(find . -name '*.c' -o -name '*.h')" ]; then \
+		find . -name '*.c' -o -name '*.h' | xargs clang-format -i --style=file; \
+	else \
+		echo "No .c or .h files found to format."; \
+	fi
 	@echo "Проверка и форматирование кода завершено."
 	@rm -f .clang-format
 	@echo "Файл clang-format удален из папки src."

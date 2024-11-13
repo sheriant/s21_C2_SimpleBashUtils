@@ -41,43 +41,42 @@ bool parser(int argc, char *argv[], Options *flags) {
              -1 &&
          !error_flag) {
     switch (opt) {
-    case 'b':
-      flags->b = true;
-      break;
-    case 'e':
-      flags->E = true;
-      flags->v = true;
-      break;
-    case 'E':
-      flags->E = true;
-      break;
-    case 'n':
-      flags->n = true;
-      break;
-    case 's':
-      flags->s = true;
-      break;
-    case 't':
-      flags->T = true;
-      flags->v = true;
-      break;
-    case 'T':
-      flags->T = true;
-      break;
-    case 'v':
-      flags->v = true;
-      break;
-    case '?':
-      error_flag = true;
-      break;
-    default:
-      error_flag = true;
-      break;
+      case 'b':
+        flags->b = true;
+        break;
+      case 'e':
+        flags->E = true;
+        flags->v = true;
+        break;
+      case 'E':
+        flags->E = true;
+        break;
+      case 'n':
+        flags->n = true;
+        break;
+      case 's':
+        flags->s = true;
+        break;
+      case 't':
+        flags->T = true;
+        flags->v = true;
+        break;
+      case 'T':
+        flags->T = true;
+        break;
+      case 'v':
+        flags->v = true;
+        break;
+      case '?':
+        error_flag = true;
+        break;
+      default:
+        error_flag = true;
+        break;
     }
   }
 
-  if (flags->b)
-    flags->n = false;
+  if (flags->b) flags->n = false;
   return error_flag;
 }
 
@@ -120,10 +119,8 @@ void output(FILE *f, Options *flags) {
     } else if (flags->v) {
       current_char = flag_v(current_char);
     }
-    if (current_char != '\n')
-      empty_line = 0;
-    if (empty_line <= 2 && tab == false)
-      fputc(current_char, stdout);
+    if (current_char != '\n') empty_line = 0;
+    if (empty_line <= 2 && tab == false) fputc(current_char, stdout);
     last_char = current_char;
     tab = false;
   }
@@ -139,8 +136,7 @@ void flag_t() { printf("^I"); }
 
 int flag_v(int current_char) {
   current_char = current_char & 0x7F;
-  if (current_char > 127 && current_char < 160)
-    printf("M-^");
+  if (current_char > 127 && current_char < 160) printf("M-^");
   if ((current_char < 32 && current_char != '\n' && current_char != '\t') ||
       current_char == 127)
     printf("^");
