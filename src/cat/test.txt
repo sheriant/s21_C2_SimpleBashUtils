@@ -1,0 +1,32 @@
+Linus Torvalds and the creation of Linux
+
+Linus Torvalds, a Finnish programmer, is known as the creator of the Linux operating system.
+In 1991, as a student at the University of Helsinki, he released the first version of the Linux kernel.
+Initially, it was just a hobby when he decided to create a free operating system for the x86 architecture,
+inspired by the Minix system.
+
+
+
+
+
+
+
+Key points			:
+1. Year of creation: 1991
+2. First version: Linux 0.01
+3. The idea: To create a free and open operating system.
+4. Impact: Linux has become the basis for many distributions and is used on servers, desktops and mobile devices.
+
+Linux Development	:
+Linux has grown significantly since its inception.
+Today, it is used on more than 70% of all servers in the world and is the basis for most supercomputers.
+Linus also developed the Git version control system in 2005, which simplified project management in an open source environment.
+
+Linus's personality	:
+Linus Torvalds is known not only for his technical achievements,
+but also with his straightforward style of communication. In 2018, he announced the temporary cessation of his work on the Linux kernel in order
+to work on his behavior in the developer community.
+
+Quote				:
+"I'm making a (free) operating system (just as a hobby,
+it won't be big and professional...)" - Linus Torvalds about the beginning of Linux development.
