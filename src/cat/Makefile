@@ -8,7 +8,7 @@ CFLAGS = -Wall -Werror -Wextra -std=c11
 LIBS = -lm -lncurses
 GIT_COMMIT := $(shell git log -1 --pretty=format:%h)
 S21CAT = ./s21_cat
-TEST = test_case_cat.txt
+FILE = test_case_cat.txt
 
 # Цвета
 GREEN = \033[0;32m
@@ -43,39 +43,39 @@ tests_cat:
 
 # Стандартный вывод
 	@echo -n "Test basic cat command: "
-	@-diff <($(S21CAT) $(TEST)) <(cat $(TEST)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) $(FILE)) <(cat $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -b флаг (нумерует непустые строки)
 	@echo -n "Test -b flag: "
-	@-diff <($(S21CAT) -b $(TEST)) <(cat -b $(TEST)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) -b $(FILE)) <(cat -b $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -e флаг (показывает непечатаемые символы, отображает $ в конце каждой строки)
 	@echo -n "Test -e flag: "
-	@-diff <($(S21CAT) -e $(TEST)) <(cat -e $(TEST)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) -e $(FILE)) <(cat -e $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -n флаг (нумерует все строки)
 	@echo -n "Test -n flag: "
-	@-diff <($(S21CAT) -n $(TEST)) <(cat -n $(TEST)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) -n $(FILE)) <(cat -n $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -s флаг (сжимает пустые строки)
 	@echo -n "Test -s flag: "
-	@-diff <($(S21CAT) -s $(TEST)) <(cat -s $(TEST)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) -s $(FILE)) <(cat -s $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -t флаг (Отображает табуляцию как ^I)
 	@echo -n "Test -t flag: "
-	@-diff <($(S21CAT) -t $(TEST)) <(cat -t $(TEST)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) -t $(FILE)) <(cat -t $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # --number флаг (эквивалент -n)
 	@echo -n "Test --number flag: "
-	@-diff <($(S21CAT) --number $(TEST)) <(cat -n $(TEST)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) --number $(FILE)) <(cat -n $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # --squeeze-blank флаг (эквивалент to -s)
 	@echo -n "Test --squeeze-blank flag: "
-	@-diff <($(S21CAT) --squeeze-blank $(TEST)) <(cat -s $(TEST)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) --squeeze-blank $(FILE)) <(cat -s $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # --number-nonblank флаг (эквивалент to -b)
 	@echo -n "Test --number-nonblank flag: "
-	@-diff <($(S21CAT) --number-nonblank $(TEST)) <(cat -b $(TEST)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) --number-nonblank $(FILE)) <(cat -b $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # Cppcheck + valgrind
 	@echo -n "Test Cppcheck: "
