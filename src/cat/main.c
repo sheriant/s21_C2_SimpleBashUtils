@@ -1,22 +1,4 @@
-#include <getopt.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-typedef struct {
-  bool b, E, n, s, T, v;
-} Options;
-
-void check_option(int *current_char, int *prev_char, Options flags, FILE f);
-bool parser(int argc, char *argv[], Options *flags);
-void output(FILE *f, Options *flags);
-void cat(int argc, char *argv[], Options *flags);
-
-int flag_b_or_n(int line_counter);
-void flag_e();
-void flag_t();
-int flag_v(int current_char);
-int flag_s(int current_char);
+#include "main.h"
 
 int main(int argc, char *argv[]) {
   Options flags = {false};
@@ -36,7 +18,7 @@ bool parser(int argc, char *argv[], Options *flags) {
                                   {NULL, 0, NULL, 0}};
 
   bool error_flag = false;
-  int opt;
+  int opt = 0;
   while ((opt = getopt_long(argc, argv, "beEnstTv", long_options, NULL)) !=
              -1 &&
          !error_flag) {
@@ -81,25 +63,19 @@ bool parser(int argc, char *argv[], Options *flags) {
 }
 
 void cat(int argc, char *argv[], Options *flags) {
-  int index;
-  if (optind) {
-    index = optind;
-  } else {
-    index = 1;
-  }
-  for (; index < argc; index++) {
-    FILE *f = fopen(argv[index], "r");
+  for (; optind < argc; optind++) {  // да, вот так, сэкономил 1 строчку кода!
+    FILE *f = fopen(argv[optind], "r");
     if (f != NULL) {
       output(f, flags);
       fclose(f);
     } else {
-      fprintf(stderr, "Error opening file %s\n", argv[index]);
+      fprintf(stderr, "Error opening file %s\n", argv[optind]);
     }
   }
 }
 
 void output(FILE *f, Options *flags) {
-  int current_char;
+  int current_char = 0;
   int last_char = '\n';
   int line_counter = 1;
   int empty_line = 0;
@@ -112,9 +88,9 @@ void output(FILE *f, Options *flags) {
     } else if (flags->s && current_char == '\n') {
       empty_line++;
     } else if (flags->E && current_char == '\n') {
-      flag_e();
+      printf("$");
     } else if (flags->T && current_char == '\t') {
-      flag_t();
+      printf("^I");
       tab = true;
     } else if (flags->v) {
       current_char = flag_v(current_char);
@@ -131,9 +107,6 @@ int flag_b_or_n(int line_counter) {
   line_counter++;
   return line_counter;
 }
-void flag_e() { printf("$"); }
-void flag_t() { printf("^I"); }
-
 int flag_v(int current_char) {
   current_char = current_char & 0x7F;
   if (current_char > 127 && current_char < 160) printf("M-^");

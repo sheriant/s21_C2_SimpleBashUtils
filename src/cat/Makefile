@@ -8,15 +8,15 @@ CFLAGS = -Wall -Werror -Wextra -std=c11
 LIBS = -lm -lncurses
 GIT_COMMIT := $(shell git log -1 --pretty=format:%h)
 
-# --------------------------------------------------------------------------Реализация (Simple Bash Utils)
-# Сборка cat
+# --------------------------------------------------------------------------Реализация (Simple Bash Utils / cat)
+# Сборка
 s21_cat:
 	@$(CC) $(CFLAGS) *.c -o s21_cat
 	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 	@echo "┃          cat is ready to work!          ┃"
 	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
-# Тесты cat
+# Тесты
 test_cat:
 	-diff <(./s21_cat test_case_cat.txt) <(cat test_case_cat.txt)
 	-diff <(./s21_cat -e test_case_cat.txt) <(cat -e test_case_cat.txt)
@@ -31,12 +31,14 @@ test_cat:
 	@echo "┃             Тесты выполнены!            ┃"
 	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
+# Удаление исполняемого файла
 clean_cat:
 	@rm -rf s21_cat
 	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 	@echo "┃             ДАННЫЕ УДАЛЕНЫ!             ┃"
 	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
+# Пересборка исполняемого файла
 rebuild_cat: clean_cat s21_cat
 
 # --------------------------------------------------------------------------Полезные команды
@@ -78,9 +80,9 @@ cpp:
 
 # Утечки leaks
 leaks:
-	@leaks -atExit -- $(OUTPUT_BUILD)
+	@leaks -atExit -- s21_cat
 
 # Утечки valgrind
-valgrind: rebuild
-	valgrind --tool=memcheck --leak-check=yes -q $(OUTPUT_BUILD)
-	make clean
+valgrind: rebuild_cat
+	valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q ./s21_cat
+	make clean_cat

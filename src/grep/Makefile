@@ -1,113 +1,57 @@
 # --------------------------------------------------------------------------Зависимости
-.PHONY: all rebuild build run clean clang config push cpp leaks valgrind s21_cat s21_grep test_cat clean_cat
+.PHONY: s21_grep test_grep clean_grep rebuild_grep clang config push cpp leaks valgrind
 
-# --------------------------------------------------------------------------Переменные (общие)
+# --------------------------------------------------------------------------Переменные
 SHELL := /bin/bash
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra -std=c11
-BUILD_DIR = ../build
 LIBS = -lm -lncurses
 GIT_COMMIT := $(shell git log -1 --pretty=format:%h)
-OUTPUT_BUILD = $(BUILD_DIR)/build
 
-# --------------------------------------------------------------------------Переменные (Simple Bash Utils)
-CAT_DIR = cat
-OUTPUT_CAT = $(CAT_DIR)/s21_cat
-GREP_DIR = grep
-OUTPUT_GREP = $(GREP_DIR)/s21_grep
-
-
-
-# --------------------------------------------------------------------------Реализация (Simple Bash Utils)
-# Сборка cat
-s21_cat:
-	@$(CC) $(CFLAGS) $(CAT_DIR)/*.c -o $(OUTPUT_CAT)
-	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-	@echo "┃          cat is ready to work!          ┃"
-	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-
-# Сборка grep
+# --------------------------------------------------------------------------Реализация (Simple Bash Utils / grep)
+# Сборка
 s21_grep:
-	@$(GREP_DIR) $(CC) $(CFLAGS) *.c -o $(OUTPUT_GREP)
-	@echo "\033[0;32m"
+	@$(CC) $(CFLAGS) *.c -o s21_grep
 	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 	@echo "┃         grep is ready to work!          ┃"
 	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-	@echo "\033[0m"
 
-# Тесты cat
-test_cat:
-	-diff <(cat/s21_cat cat/test.txt) <(cat cat/test.txt)
-	-diff <(cat/s21_cat -e cat/test.txt) <(cat -e cat/test.txt)
-	-diff <(cat/s21_cat -t cat/test.txt) <(cat -t cat/test.txt)
-	-diff <(cat/s21_cat -s cat/test.txt) <(cat -s cat/test.txt)
-	-diff <(cat/s21_cat --squeeze-blank cat/test.txt) <(cat -s cat/test.txt)
-	-diff <(cat/s21_cat -n cat/test.txt) <(cat -n cat/test.txt)
-	-diff <(cat/s21_cat --number cat/test.txt) <(cat -n cat/test.txt)
-	-diff <(cat/s21_cat -b cat/test.txt) <(cat -b cat/test.txt)
-	-diff <(cat/s21_cat --number-nonblank cat/test.txt) <(cat -b cat/test.txt)
+# Тесты
+test_grep:
+#	-diff <(./s21_grep test_case_grep.txt) <(grep test_case_grep.txt)
+#	-diff <(./s21_grep -e test_case_grep.txt) <(grep -e test_case_grep.txt)
+#	-diff <(./s21_grep -t test_case_grep.txt) <(grep -t test_case_grep.txt)
+#	-diff <(./s21_grep -s test_case_grep.txt) <(grep -s test_case_grep.txt)
+#	-diff <(./s21_grep --squeeze-blank test_case_grep.txt) <(grep -s test_case_grep.txt)
+#	-diff <(./s21_grep -n test_case_grep.txt) <(grep -n test_case_grep.txt)
+#	-diff <(./s21_grep --number test_case_grep.txt) <(grep -n test_case_grep.txt)
+#	-diff <(./s21_grep -b test_case_grep.txt) <(grep -b test_case_grep.txt)
+#	-diff <(./s21_grep --number-nonblank test_case_grep.txt) <(grep -b test_case_grep.txt)
 	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 	@echo "┃             Тесты выполнены!            ┃"
 	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
-clean_cat:
-	@rm -rf $(OUTPUT_CAT) \
-			$(shell find .. -name '*.o' -or -name '*.a' -or -name '*.so')
+# Удаление исполняемого файла
+clean_grep:
+	@rm -rf s21_grep
 	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 	@echo "┃             ДАННЫЕ УДАЛЕНЫ!             ┃"
 	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
-# --------------------------------------------------------------------------Компиляция и запуск программы
-# Сборка билда и запуск
-all: build run
-
-# Пересборка
-rebuild: clean build run
-
-# Компиляция
-build: 
-	@$(CC) $(CFLAGS) *.c -o $(OUTPUT_BUILD)
-	@echo "\033[0;32m"
-	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-	@echo "┃           ПРОГРАММА СОБРАНА!            ┃"
-	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-	@echo "\033[0m"
-
-# Запуск
-
-run:
-	@echo "\033[0;32m"
-	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-	@echo "┃          ПРОГРАММА ЗАПУЩЕНА!            ┃"
-	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-	@echo "\033[0m"
-	@$(OUTPUT_BUILD)
-
-# Очистка
-clean:
-	@rm -rf $(BUILD_DIR)/* \
-			$(shell find .. -name '*.o' -or -name '*.a' -or -name '*.so')
-	@echo "\033[0;31m"
-	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-	@echo "┃             ДАННЫЕ УДАЛЕНЫ!             ┃"
-	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-	@echo "\033[0m"
-
-
+# Пересборка исполняемого файла
+rebuild_grep: clean_grep s21_grep
 
 # --------------------------------------------------------------------------Полезные команды
 # Форматирование кода
 clang:
-	@cp ../materials/linters/.clang-format .clang-format
-	@echo "Файл clang-format скопирован в папку src."
-	@if [ -n "$$(find . -name '*.c' -o -name '*.h')" ]; then \
-		find . -name '*.c' -o -name '*.h' | xargs clang-format -i --style=file; \
-	else \
-		echo "No .c or .h files found to format."; \
-	fi
-	@echo "Проверка и форматирование кода завершено."
+	@cp ../../materials/linters/.clang-format .clang-format
+	@echo "Файл clang-format скопирован в папку grep."
+	@clang-format -n *.c
+	@echo "Проверка кода по Clang завершена."	
+	@clang-format -i *.c
+	@echo "Форматирование кода по Clang завершено."		
 	@rm -f .clang-format
-	@echo "Файл clang-format удален из папки src."
+	@echo "Файл clang-format удален из папки grep."
 
 # Конфиг пользователя
 config:
@@ -118,19 +62,17 @@ config:
 # git add, commit и push
 push:
 	@read -p "Введите сообщение коммита: " commit_msg; \
-	cd ..; \
+	cd ../..; \
 	git add .; \
 	git commit -m "$$commit_msg"; \
 	git push origin develop
-	@echo "\033[0;32m"
 	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-	@echo "┃          БАЦ-БАЦ-БАЦ И В ПРОД           ┃"
+	@echo "┃         Bomb has been planted!          ┃"
 	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-	@echo "\033[0m"
 
 
 
-# --------------------------------------------------------------------------Проверки
+# --------------------------------------------------------------------------Проверки памяти
 # CPP-check
 cpp:
 	@cppcheck --enable=all --suppress=missingIncludeSystem *.c
