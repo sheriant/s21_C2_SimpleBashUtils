@@ -11,7 +11,7 @@ GIT_COMMIT := $(shell git log -1 --pretty=format:%h)
 # --------------------------------------------------------------------------Реализация (Simple Bash Utils / grep)
 # Сборка
 s21_grep:
-	@$(CC) $(CFLAGS) *.c -o s21_grep
+#	@$(CC) $(CFLAGS) *.c -o s21_grep
 	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 	@echo "┃         grep is ready to work!          ┃"
 	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
@@ -33,7 +33,7 @@ test_grep:
 
 # Удаление исполняемого файла
 clean_grep:
-	@rm -rf s21_grep
+#	@rm -rf s21_grep
 	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 	@echo "┃             ДАННЫЕ УДАЛЕНЫ!             ┃"
 	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
@@ -80,9 +80,9 @@ cpp:
 
 # Утечки leaks
 leaks:
-	@leaks -atExit -- $(OUTPUT_BUILD)
+	@leaks -atExit -- s21_grep
 
 # Утечки valgrind
-valgrind: rebuild
-	valgrind --tool=memcheck --leak-check=yes -q $(OUTPUT_BUILD)
-	make clean
+valgrind: rebuild_grep
+	valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q ./s21_grep
+	make clean_grep

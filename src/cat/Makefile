@@ -51,7 +51,7 @@ clang:
 	@clang-format -i *.c
 	@echo "Форматирование кода по Clang завершено."		
 	@rm -f .clang-format
-	@echo "Файл clang-format удален из папки cat."
+	@echo "Файл .clang-format удален из папки cat."
 
 # Конфиг пользователя
 config:

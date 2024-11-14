@@ -107,6 +107,7 @@ int flag_b_or_n(int line_counter) {
   line_counter++;
   return line_counter;
 }
+
 int flag_v(int current_char) {
   current_char = current_char & 0x7F;
   if (current_char > 127 && current_char < 160) printf("M-^");
