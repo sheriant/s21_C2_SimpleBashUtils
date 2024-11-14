@@ -137,8 +137,12 @@ void flag_t() { printf("^I"); }
 int flag_v(int current_char) {
   current_char = current_char & 0x7F;
   if (current_char > 127 && current_char < 160) printf("M-^");
-  if ((current_char < 32 && current_char != '\n' && current_char != '\t') ||
-      current_char == 127)
+  if (current_char < 32 && current_char != '\n' && current_char != '\t') {
     printf("^");
+    current_char += 64;
+  } else if (current_char == 127) {
+    printf("^");
+    current_char = '?';
+  }
   return current_char;
 }

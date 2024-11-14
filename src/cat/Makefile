@@ -44,12 +44,10 @@ rebuild_cat: clean_cat s21_cat
 clang:
 	@cp ../../materials/linters/.clang-format .clang-format
 	@echo "Файл clang-format скопирован в папку cat."
-	@if [ -n "$$(find . -name '*.c' -o -name '*.h')" ]; then \
-		find . -name '*.c' -o -name '*.h' | xargs clang-format -i --style=file; \
-	else \
-		echo "No .c or .h files found to format."; \
-	fi
-	@echo "Проверка и форматирование кода завершено."
+	@clang-format -n *.c
+	@echo "Проверка кода по Clang завершена."	
+	@clang-format -i *.c
+	@echo "Форматирование кода по Clang завершено."		
 	@rm -f .clang-format
 	@echo "Файл clang-format удален из папки cat."
 
@@ -62,7 +60,7 @@ config:
 # git add, commit и push
 push:
 	@read -p "Введите сообщение коммита: " commit_msg; \
-	cd ..; \
+	cd ../..; \
 	git add .; \
 	git commit -m "$$commit_msg"; \
 	git push origin develop
