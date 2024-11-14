@@ -18,15 +18,15 @@ s21_cat:
 
 # Тесты cat
 test_cat:
-	-diff <(s21_cat test.txt) <(cat test.txt)
-	-diff <(s21_cat -e test.txt) <(cat -e test.txt)
-	-diff <(s21_cat -t test.txt) <(cat -t test.txt)
-	-diff <(s21_cat -s test.txt) <(cat -s test.txt)
-	-diff <(s21_cat --squeeze-blank test.txt) <(cat -s test.txt)
-	-diff <(s21_cat -n test.txt) <(cat -n test.txt)
-	-diff <(s21_cat --number test.txt) <(cat -n test.txt)
-	-diff <(s21_cat -b test.txt) <(cat -b test.txt)
-	-diff <(s21_cat --number-nonblank test.txt) <(cat -b test.txt)
+	-diff <(./s21_cat test_case_cat.txt) <(cat test_case_cat.txt)
+	-diff <(./s21_cat -e test_case_cat.txt) <(cat -e test_case_cat.txt)
+	-diff <(./s21_cat -t test_case_cat.txt) <(cat -t test_case_cat.txt)
+	-diff <(./s21_cat -s test_case_cat.txt) <(cat -s test_case_cat.txt)
+	-diff <(./s21_cat --squeeze-blank test_case_cat.txt) <(cat -s test_case_cat.txt)
+	-diff <(./s21_cat -n test_case_cat.txt) <(cat -n test_case_cat.txt)
+	-diff <(./s21_cat --number test_case_cat.txt) <(cat -n test_case_cat.txt)
+	-diff <(./s21_cat -b test_case_cat.txt) <(cat -b test_case_cat.txt)
+	-diff <(./s21_cat --number-nonblank test_case_cat.txt) <(cat -b test_case_cat.txt)
 	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 	@echo "┃             Тесты выполнены!            ┃"
 	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
