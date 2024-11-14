@@ -21,16 +21,16 @@ NC = \033[0m
 # Сборка
 s21_cat:
 	@$(CC) $(CFLAGS) *.c -o s21_cat
-	@echo -n "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-	@echo -n "┃          cat is ready to work!          ┃"
-	@echo -n "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+	@echo "┃          cat is ready to work!          ┃"
+	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
 # Удаление исполняемого файла
 clean_cat:
 	@rm -rf s21_cat
-	@echo -n "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-	@echo -n "┃             ДАННЫЕ УДАЛЕНЫ!             ┃"
-	@echo -n "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+	@echo "┃             ДАННЫЕ УДАЛЕНЫ!             ┃"
+	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
 # Пересборка исполняемого файла
 rebuild_cat: clean_cat s21_cat
@@ -90,19 +90,19 @@ tests_cat:
 # Форматирование кода
 clang:
 	@cp ../../materials/linters/.clang-format .clang-format
-	@echo -n "Файл clang-format скопирован в папку cat."
+	@echo "Файл clang-format скопирован в папку cat."
 	@clang-format -n *.c
-	@echo -n "Проверка кода по Clang завершена."	
+	@echo "Проверка кода по Clang завершена."	
 	@clang-format -i *.c
-	@echo -n "Форматирование кода по Clang завершено."		
+	@echo "Форматирование кода по Clang завершено."		
 	@rm -f .clang-format
-	@echo -n "Файл .clang-format удален из папки cat."
+	@echo "Файл .clang-format удален из папки cat."
 
 # Конфиг пользователя
 config:
 	@git config --global user.name "Sheriant"
 	@git config --global user.email "shariant@student.21-school.ru"
-	@echo -n "Привет Sheriant! Рад видеть тебя снова!"
+	@echo "Привет Sheriant! Рад видеть тебя снова!"
 
 # git add, commit и push
 push:
@@ -111,9 +111,9 @@ push:
 	git add .; \
 	git commit -m "$$commit_msg"; \
 	git push origin develop
-	@echo -n "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-	@echo -n "┃         Bomb has been planted!          ┃"
-	@echo -n "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+	@echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+	@echo "┃         Bomb has been planted!          ┃"
+	@echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
 
 
@@ -121,7 +121,7 @@ push:
 # CPP-check
 cpp:
 	@cppcheck --enable=all --suppress=missingIncludeSystem $(S21CAT)
-	@echo -n "Проверка CPP выполнена!"
+	@echo "Проверка CPP выполнена!"
 
 # Утечки leaks
 leaks:
