@@ -2,8 +2,7 @@
 
 int main(int argc, char *argv[]) {
   Options flags = {false};
-  if (!(parser(argc, argv, &flags))
-) {
+  if (!(parser(argc, argv, &flags))) {
     cat(argc, argv, &flags);
   } else {
     fprintf(stderr, "Usage: %s [-bEensTtv] [file ...]\n", argv[0]);
@@ -48,9 +47,6 @@ bool parser(int argc, char *argv[], Options *flags) {
         break;
       case 'v':
         flags->v = true;
-        break;
-      case '?':
-        error_flag = true;
         break;
       default:
         error_flag = true;
