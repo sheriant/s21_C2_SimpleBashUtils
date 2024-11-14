@@ -9,50 +9,57 @@ typedef struct {
   char *pattern_file;
 } Options;
 
-void parser(int argc, char *argv[], Options *flags);
+bool parser(int argc, char *argv[], Options *flags);
+void grep(int argc, char *argv[], Options *flags);
 //void output(FILE *f, Options *flags);
-//void grep(int argc, char *argv[], Options *flags);
 
 
 int main(int argc, char *argv[]) {
   Options flags = {0};
-
+  if (!(parser(argc, argv, &flags))) {
+    grep(argc, argv, &flags);
+  } else {
+    fprintf(stderr, "Usage: %s [-] [file ...]\n", argv[0]);
+  }
   return 0;
 }
 
 bool parser(int argc, char *argv[], Options *flags) {
   bool error_flag = false;
   int opt = 0;
-  while ((opt = getopt(argc, argv, "e:ivcln")) != -1 && !error_flag) {
+  while ((opt = getopt(argc, argv, "ivclnhsof:e:")) != -1 && !error_flag) {
     switch (opt) {
-      case 'e':
-        flags->e = true;
-        break;
       case 'i':
-        flags->E = true;
-        flags->v = true;
+        flags->i = true;
         break;
       case 'v':
-        flags->E = true;
+        flags->v = true;
         break;
       case 'c':
-        flags->n = true;
+        flags->c = true;
         break;
       case 'l':
-        flags->s = true;
+        flags->l = true;
         break;
       case 'n':
-        flags->T = true;
-        flags->v = true;
+        flags->n = true;
         break;
-      case 'T':
-        flags->T = true;
+      case 'h':
+        flags->h = true;
         break;
-      case 'v':
-        flags->v = true;
+      case 's':
+        flags->s = true;
         break;
-      case '?':
-        error_flag = true;
+      case 'o':
+        flags->o = true;
+        break;
+      case 'e':
+        flags->e = true;
+        flags->pattern = optarg;
+        break;
+      case 'f':
+        flags->f = true;
+        flags->pattern_file = optarg;
         break;
       default:
         error_flag = true;
@@ -60,6 +67,5 @@ bool parser(int argc, char *argv[], Options *flags) {
     }
   }
 
-  if (flags->b) flags->n = false;
   return error_flag;
 }
