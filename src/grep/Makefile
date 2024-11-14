@@ -7,8 +7,6 @@ CC = gcc
 CFLAGS = -Wall -Werror -Wextra -std=c11
 BUILD_DIR = ../build
 LIBS = -lm -lncurses
-C_FILES := $(wildcard *.c)
-H_FILES := $(wildcard *.h)
 GIT_COMMIT := $(shell git log -1 --pretty=format:%h)
 OUTPUT_BUILD = $(BUILD_DIR)/build
 
