@@ -1,6 +1,8 @@
+#include <stdio.h>
 #include <getopt.h>
 #include <stdbool.h>
-#include <stdio.h>
+#include <regex.h>
+
 
 typedef struct {
   bool e, i, v, c, l, n;
@@ -19,7 +21,7 @@ int main(int argc, char *argv[]) {
   if (!(parser(argc, argv, &flags))) {
     grep(argc, argv, &flags);
   } else {
-    fprintf(stderr, "Usage: %s [-] [file ...]\n", argv[0]);
+    fprintf(stderr, "Usage: %s [-] template [file_name]\n", argv[0]);
   }
   return 0;
 }
@@ -68,4 +70,25 @@ bool parser(int argc, char *argv[], Options *flags) {
   }
 
   return error_flag;
+}
+
+void grep(int argc, char *argv[], Options *flags) {
+  if (flags->e && optind < argc) {
+    flags.pattern = argv[optind];
+    optind++;
+    } else if (flags->f && optind < argc) {
+      flags->pattern_file = argv[optind];
+      optind++;
+    }
+
+    regex_t regex;
+    int cflags = REG_EXTENDED | (flags.i_flag ? REG_ICASE : 0);
+
+    if (regcomp(&regex, flags.pattern, cflags) != 0) {
+        fprintf(stderr, "Failed to compile regex\n");
+    } else {
+
+    }
+    fprintf(stderr, "Error opening file %s\n", argv[optind]);
+
 }

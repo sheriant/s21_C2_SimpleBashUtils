@@ -79,11 +79,18 @@ tests_cat:
 
 # Cppcheck + valgrind
 	@echo -n "Test Cppcheck: "
-	@cppcheck $(S21CAT) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
-	@echo -n "Test Valgrind: "
+	@cppcheck --enable=all --std=c11 -D_POSIX_C_SOURCE=201709L \
+	--suppress=missingIncludeSystem --suppress=checkersReport --suppress=constParameter --suppress=constParameterPointer main.c main.h \
+	> /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@echo -n "Test Valgrind (empty): "
 	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21CAT) > /dev/null 2>&1 \
 	&& echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
-
+	@echo -n "Test Valgrind (with flag -e): "
+	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21CAT) -b test_case_cat.txt > /dev/null 2>&1 \
+	&& echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@echo -n "Test Valgrind (with non-existent flag): "
+	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21CAT) -o test_case_cat.txt > /dev/null 2>&1 \
+	&& echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 
 # --------------------------------------------------------------------------Полезные команды
@@ -120,7 +127,8 @@ push:
 # --------------------------------------------------------------------------Проверки памяти
 # CPP-check
 cpp:
-	@cppcheck --enable=all --suppress=missingIncludeSystem $(S21CAT)
+	@cppcheck --enable=all --std=c11 -D_POSIX_C_SOURCE=201709L \
+	--suppress=missingIncludeSystem --suppress=checkersReport --suppress=constParameter --suppress=constParameterPointer main.c main.h
 	@echo "Проверка CPP выполнена!"
 
 # Утечки leaks
