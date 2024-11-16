@@ -4,7 +4,7 @@
 # --------------------------------------------------------------------------Переменные
 SHELL := /bin/bash
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -std=c11
+CFLAGS = -Wall -Werror -Wextra -std=c11 -pedantic
 LIBS = -lm -lncurses
 GIT_COMMIT := $(shell git log -1 --pretty=format:%h)
 S21CAT = ./s21_cat
@@ -38,50 +38,55 @@ rebuild_cat: clean_cat s21_cat
 
 
 # --------------------------------------------------------------------------Тесты 
-tests_cat:
+tests_cat: rebuild_cat
 	@echo "Running tests for s21_cat..."
 
 # Стандартный вывод
 	@echo -n "Test basic cat command: "
-	@-diff <($(S21CAT) $(FILE)) <(cat $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) $(FILE)) <(cat $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -b флаг (нумерует непустые строки)
 	@echo -n "Test -b flag: "
-	@-diff <($(S21CAT) -b $(FILE)) <(cat -b $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) -b $(FILE)) <(cat -b $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -e флаг (показывает непечатаемые символы, отображает $ в конце каждой строки)
 	@echo -n "Test -e flag: "
-	@-diff <($(S21CAT) -e $(FILE)) <(cat -e $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) -e $(FILE)) <(cat -e $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -n флаг (нумерует все строки)
 	@echo -n "Test -n flag: "
-	@-diff <($(S21CAT) -n $(FILE)) <(cat -n $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) -n $(FILE)) <(cat -n $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -s флаг (сжимает пустые строки)
 	@echo -n "Test -s flag: "
-	@-diff <($(S21CAT) -s $(FILE)) <(cat -s $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) -s $(FILE)) <(cat -s $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -t флаг (Отображает табуляцию как ^I)
 	@echo -n "Test -t flag: "
-	@-diff <($(S21CAT) -t $(FILE)) <(cat -t $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) -t $(FILE)) <(cat -t $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # --number флаг (эквивалент -n)
 	@echo -n "Test --number flag: "
-	@-diff <($(S21CAT) --number $(FILE)) <(cat -n $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) --number $(FILE)) <(cat -n $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # --squeeze-blank флаг (эквивалент to -s)
 	@echo -n "Test --squeeze-blank flag: "
-	@-diff <($(S21CAT) --squeeze-blank $(FILE)) <(cat -s $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) --squeeze-blank $(FILE)) <(cat -s $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # --number-nonblank флаг (эквивалент to -b)
 	@echo -n "Test --number-nonblank flag: "
-	@-diff <($(S21CAT) --number-nonblank $(FILE)) <(cat -b $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21CAT) --number-nonblank $(FILE)) <(cat -b $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# Cppcheck + valgrind
+# -etsnb флаг (Все флаги)
+	@echo -n "Test all flags: "
+	@-diff <($(S21CAT) -etsnb $(FILE)) <(cat -etsnb $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+# Cppcheck + valgrind + style test
 	@echo -n "Test Cppcheck: "
 	@cppcheck --enable=all --std=c11 -D_POSIX_C_SOURCE=201709L \
 	--suppress=missingIncludeSystem --suppress=checkersReport --suppress=constParameter --suppress=constParameterPointer main.c main.h \
 	> /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	
 	@echo -n "Test Valgrind (empty): "
 	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21CAT) > /dev/null 2>&1 \
 	&& echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
@@ -91,6 +96,12 @@ tests_cat:
 	@echo -n "Test Valgrind (with non-existent flag): "
 	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21CAT) -o test_case_cat.txt > /dev/null 2>&1 \
 	&& echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+	@echo -n "Test style: "
+	@cp ../../materials/linters/.clang-format .clang-format
+	@clang-format --Werror -n *.c > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@rm -f .clang-format
+
 
 
 # --------------------------------------------------------------------------Полезные команды

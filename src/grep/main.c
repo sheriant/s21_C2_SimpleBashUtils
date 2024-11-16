@@ -7,88 +7,83 @@
 typedef struct {
   bool e, i, v, c, l, n;
   bool h, s, f, o;
+  bool error;
   char *pattern;
   char *pattern_file;
 } Options;
 
-bool parser(int argc, char *argv[], Options *flags);
+Options parser(int argc, char *argv[]);
 void grep(int argc, char *argv[], Options *flags);
-//void output(FILE *f, Options *flags);
+void output(int argc, char *argv[], Options flags);
 
 
 int main(int argc, char *argv[]) {
-  Options flags = {0};
-  if (!(parser(argc, argv, &flags))) {
+  if (!(parser(argc, argv))) {
     grep(argc, argv, &flags);
   } else {
-    fprintf(stderr, "Usage: %s [-] template [file_name]\n", argv[0]);
+    fprintf(stderr, "Usage: %s [ivclnhsof:[file with patterns]e:[pattern]] template [file_name]\n", argv[0]);
   }
   return 0;
 }
 
-bool parser(int argc, char *argv[], Options *flags) {
+Options parser(int argc, char *argv[]) {
+  Options flags = {0};
   bool error_flag = false;
   int opt = 0;
-  while ((opt = getopt(argc, argv, "ivclnhsof:e:")) != -1 && !error_flag) {
+  while ((opt = getopt(argc, argv, "ivclnhsof:e:")) != -1) {
     switch (opt) {
       case 'i':
-        flags->i = true;
+        flags.i = true;
         break;
       case 'v':
-        flags->v = true;
+        flags.v = true;
         break;
       case 'c':
-        flags->c = true;
+        flags.c = true;
         break;
       case 'l':
-        flags->l = true;
+        flags.l = true;
         break;
       case 'n':
-        flags->n = true;
+        flags.n = true;
         break;
       case 'h':
-        flags->h = true;
+        flags.h = true;
         break;
       case 's':
-        flags->s = true;
+        flags.s = true;
         break;
       case 'o':
-        flags->o = true;
+        flags.o = true;
         break;
       case 'e':
-        flags->e = true;
-        flags->pattern = optarg;
+        flags.e = true;
+        flags.pattern = optarg;
         break;
       case 'f':
-        flags->f = true;
-        flags->pattern_file = optarg;
+        flags.f = true;
+        flags.pattern_file = optarg;
         break;
       default:
-        error_flag = true;
+        flags.error = true;
         break;
     }
   }
 
-  return error_flag;
+  return flags;
 }
 
 void grep(int argc, char *argv[], Options *flags) {
-  if (flags->e && optind < argc) {
-    flags.pattern = argv[optind];
-    optind++;
-    } else if (flags->f && optind < argc) {
-      flags->pattern_file = argv[optind];
-      optind++;
-    }
+  printf("%d - количество аргументов\n%s - аргумент optind должен вернуть файл где ищем\n", argc, argv[optind]);
+  printf("%d - флаг c\n", flags->c);
+  printf("%d - флаг h\n", flags->h);
+  printf("%d - флаг i\n", flags->i);
+  printf("%d - флаг e: %s (паттерн)\n", flags->e, optarg);
+  printf("%d - флаг f: %s (файл с паттернами)\n", flags->f, optarg);
+}
 
-    regex_t regex;
-    int cflags = REG_EXTENDED | (flags.i_flag ? REG_ICASE : 0);
-
-    if (regcomp(&regex, flags.pattern, cflags) != 0) {
-        fprintf(stderr, "Failed to compile regex\n");
-    } else {
-
-    }
-    fprintf(stderr, "Error opening file %s\n", argv[optind]);
-
+void output(int argc, char *argv[], Options flags) {
+  Options flags = parser(argc, argv);
+  regex_t re = {0};
+  regcomp(&re flags.pattern, 0);
 }

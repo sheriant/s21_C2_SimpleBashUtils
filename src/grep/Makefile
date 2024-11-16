@@ -4,10 +4,10 @@
 # --------------------------------------------------------------------------Переменные
 SHELL := /bin/bash
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -std=c11
+CFLAGS = -Wall -Werror -Wextra -std=c11 -pedantic
 LIBS = -lm -lncurses
 GIT_COMMIT := $(shell git log -1 --pretty=format:%h)
-S21grep = ./s21_grep
+S21GREP = ./s21_grep
 FILE = test_case_grep.txt
 
 # Цвета
@@ -38,59 +38,70 @@ rebuild_grep: clean_grep s21_grep
 
 
 # --------------------------------------------------------------------------Тесты 
-tests_grep:
+tests_grep: rebuild_grep
 	@echo "Running tests for s21_grep..."
 
 # Стандартный вывод
-	@echo -n "Test command [grep] pattern [file_name]: "
-	@-diff <($(S21grep) $(FILE)) <(grep $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@echo -n "Test basic grep command: "
+	@-diff <($(S21GREP) $(FILE)) <(grep $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -b флаг (нумерует непустые строки)
-	@echo -n "Test -e flag: "
-	@-diff <($(S21grep) -e $(FILE)) <(grep -e $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@echo -n "Test -b flag: "
+	@-diff <($(S21GREP) -b $(FILE)) <(grep -b $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -e флаг (показывает непечатаемые символы, отображает $ в конце каждой строки)
-	@echo -n "Test -i flag: "
-	@-diff <($(S21grep) -i $(FILE)) <(grep -i $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@echo -n "Test -e flag: "
+	@-diff <($(S21GREP) -e $(FILE)) <(grep -e $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -n флаг (нумерует все строки)
 	@echo -n "Test -n flag: "
-	@-diff <($(S21grep) -n $(FILE)) <(grep -n $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21GREP) -n $(FILE)) <(grep -n $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -s флаг (сжимает пустые строки)
 	@echo -n "Test -s flag: "
-	@-diff <($(S21grep) -s $(FILE)) <(grep -s $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21GREP) -s $(FILE)) <(grep -s $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # -t флаг (Отображает табуляцию как ^I)
 	@echo -n "Test -t flag: "
-	@-diff <($(S21grep) -t $(FILE)) <(grep -t $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21GREP) -t $(FILE)) <(grep -t $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # --number флаг (эквивалент -n)
 	@echo -n "Test --number flag: "
-	@-diff <($(S21grep) --number $(FILE)) <(grep -n $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21GREP) --number $(FILE)) <(grep -n $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # --squeeze-blank флаг (эквивалент to -s)
 	@echo -n "Test --squeeze-blank flag: "
-	@-diff <($(S21grep) --squeeze-blank $(FILE)) <(grep -s $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21GREP) --squeeze-blank $(FILE)) <(grep -s $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
 # --number-nonblank флаг (эквивалент to -b)
 	@echo -n "Test --number-nonblank flag: "
-	@-diff <($(S21grep) --number-nonblank $(FILE)) <(grep -b $(FILE)) && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@-diff <($(S21GREP) --number-nonblank $(FILE)) <(grep -b $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# Cppcheck + valgrind
+# -etsnb флаг (Все флаги)
+	@echo -n "Test all flags: "
+	@-diff <($(S21GREP) -etsnb $(FILE)) <(grep -etsnb $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+# Cppcheck + valgrind + style test
 	@echo -n "Test Cppcheck: "
 	@cppcheck --enable=all --std=c11 -D_POSIX_C_SOURCE=201709L \
 	--suppress=missingIncludeSystem --suppress=checkersReport --suppress=constParameter --suppress=constParameterPointer main.c main.h \
 	> /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	
 	@echo -n "Test Valgrind (empty): "
-	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21grep) > /dev/null 2>&1 \
+	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP) > /dev/null 2>&1 \
 	&& echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 	@echo -n "Test Valgrind (with flag -e): "
-	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21grep) -b test_case_grep.txt > /dev/null 2>&1 \
+	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP) -b test_case_grep.txt > /dev/null 2>&1 \
 	&& echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 	@echo -n "Test Valgrind (with non-existent flag): "
-	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21grep) -o test_case_grep.txt > /dev/null 2>&1 \
+	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP) -o test_case_grep.txt > /dev/null 2>&1 \
 	&& echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+	@echo -n "Test style: "
+	@cp ../../materials/linters/.clang-format .clang-format
+	@clang-format --Werror -n *.c > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@rm -f .clang-format
+
 
 
 # --------------------------------------------------------------------------Полезные команды
@@ -137,4 +148,4 @@ leaks:
 
 # Утечки valgrind
 valgrind:
-	valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21grep)
+	valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP)
