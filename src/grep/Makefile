@@ -4,7 +4,7 @@
 # --------------------------------------------------------------------------Переменные
 SHELL := /bin/bash
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -std=c11 -pedantic
+CFLAGS = -Wall -Werror -Wextra -std=c11 -pedantic -D_GNU_SOURCE
 LIBS = -lm -lncurses
 GIT_COMMIT := $(shell git log -1 --pretty=format:%h)
 S21GREP = ./s21_grep
