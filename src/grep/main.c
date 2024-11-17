@@ -18,7 +18,8 @@ void output(int argc, char *argv[], Options flags);
 
 
 int main(int argc, char *argv[]) {
-  if (!(parser(argc, argv))) {
+  Options flags = (parser(argc, argv));
+  if (flags) {
     grep(argc, argv, &flags);
   } else {
     fprintf(stderr, "Usage: %s [ivclnhsof:[file with patterns]e:[pattern]] template [file_name]\n", argv[0]);
@@ -28,7 +29,6 @@ int main(int argc, char *argv[]) {
 
 Options parser(int argc, char *argv[]) {
   Options flags = {0};
-  bool error_flag = false;
   int opt = 0;
   while ((opt = getopt(argc, argv, "ivclnhsof:e:")) != -1) {
     switch (opt) {
@@ -69,7 +69,7 @@ Options parser(int argc, char *argv[]) {
         break;
     }
   }
-
+  if (flags.pattern == NULL) flags.pattern = argv[optind++]; 
   return flags;
 }
 
@@ -82,8 +82,13 @@ void grep(int argc, char *argv[], Options *flags) {
   printf("%d - флаг f: %s (файл с паттернами)\n", flags->f, optarg);
 }
 
+void process_file (Options flags, char *path, regex_t* regular) {
+
+}
+
 void output(int argc, char *argv[], Options flags) {
   Options flags = parser(argc, argv);
-  regex_t re = {0};
-  regcomp(&re flags.pattern, 0);
+  regex_t regular = {0};
+  int error = regcomp(&regular, flags.pattern, 0);
+  if (error) perror("Error");
 }

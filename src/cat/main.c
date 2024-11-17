@@ -1,6 +1,6 @@
 #include "main.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char const *argv[]) {
   Options flags = {false};
   if (!(parser(argc, argv, &flags))) {
     cat(argc, argv, &flags);
@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-bool parser(int argc, char *argv[], Options *flags) {
+bool parser(int argc, char const *argv[], Options *flags) {
   struct option long_options[] = {{"number-nonblank", 0, NULL, 'b'},
                                   {"number", 0, NULL, 'n'},
                                   {"squeeze-blank", 0, NULL, 's'},
@@ -18,7 +18,7 @@ bool parser(int argc, char *argv[], Options *flags) {
 
   bool error_flag = false;
   int opt = 0;
-  while ((opt = getopt_long(argc, argv, "beEnstTv", long_options, NULL)) !=
+  while ((opt = getopt_long(argc, (char *const *)argv, "beEnstTv", long_options, NULL)) !=
              -1 &&
          !error_flag) {
     switch (opt) {
@@ -58,7 +58,7 @@ bool parser(int argc, char *argv[], Options *flags) {
   return error_flag;
 }
 
-void cat(int argc, char *argv[], Options *flags) {
+void cat(int argc, char const *argv[], const Options *flags) {
   for (; optind < argc; optind++) {  // да, вот так, сэкономил 1 строчку кода!
     FILE *f = fopen(argv[optind], "r");
     if (f != NULL) {
@@ -70,7 +70,7 @@ void cat(int argc, char *argv[], Options *flags) {
   }
 }
 
-void output(FILE *f, Options *flags) {
+void output(FILE *f, const Options *flags) {
   int current_char = 0;
   int last_char = '\n';
   int line_counter = 1;

@@ -4,7 +4,7 @@
 # --------------------------------------------------------------------------Переменные
 SHELL := /bin/bash
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -std=c11 -pedantic
+CFLAGS = -Wall -Werror -Wextra -std=c11 -pedantic -D_POSIX_C_SOURCE=200809L
 LIBS = -lm -lncurses
 GIT_COMMIT := $(shell git log -1 --pretty=format:%h)
 S21CAT = ./s21_cat
@@ -139,7 +139,7 @@ push:
 # CPP-check
 cpp:
 	@cppcheck --enable=all --std=c11 -D_POSIX_C_SOURCE=201709L \
-	--suppress=missingIncludeSystem --suppress=checkersReport --suppress=constParameter --suppress=constParameterPointer main.c main.h
+	--suppress=missingIncludeSystem --suppress=checkersReport main.c main.h
 	@echo "Проверка CPP выполнена!"
 
 # Утечки leaks
