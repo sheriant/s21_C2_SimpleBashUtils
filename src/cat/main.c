@@ -59,7 +59,7 @@ bool parser(int argc, char const *argv[], Options *flags) {
 }
 
 void cat(int argc, char const *argv[], const Options *flags) {
-  for (; optind < argc; optind++) {  // да, вот так, сэкономил 1 строчку кода!
+  for (; optind < argc; optind++) {
     FILE *f = fopen(argv[optind], "r");
     if (f != NULL) {
       output(f, flags);
