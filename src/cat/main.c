@@ -18,8 +18,8 @@ bool parser(int argc, char const *argv[], Options *flags) {
 
   bool error_flag = false;
   int opt = 0;
-  while ((opt = getopt_long(argc, (char *const *)argv, "beEnstTv", long_options, NULL)) !=
-             -1 &&
+  while ((opt = getopt_long(argc, (char *const *)argv, "beEnstTv", long_options,
+                            NULL)) != -1 &&
          !error_flag) {
     switch (opt) {
       case 'b':
