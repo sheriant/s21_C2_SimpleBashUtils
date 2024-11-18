@@ -103,10 +103,9 @@ void grep(int argc, char *argv[], Options *flags) {
   int file_count = argc - optind;
   for (int i = optind; i < argc; i++) {
     if (process_file(argv[i], &regex, flags, file_count)) {
-      exit(1);
+      if (!flags->s) fprintf(stderr, "s21_grep: %s: No such file or directory\n", argv[i]);
     }
   }
-
   regfree(&regex);
 }
 
