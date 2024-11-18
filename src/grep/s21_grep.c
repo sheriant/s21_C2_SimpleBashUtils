@@ -4,12 +4,9 @@ int main(int argc, char *argv[]) {
   Options flags = {0};
   if (parser(argc, argv, &flags)) {
     fprintf(stderr,
-            "Usage: %s [ivclnhsof:[file with patterns]e:[pattern]] template "
-            "[file_name]\n",
+            "Usage: %s [OPTION]... PATTERNS [FILE]...\n",
             argv[0]);
-    return 1;
-  }
-  if (optind == argc) {
+  } else if (optind == argc) {
     char *argv_new[] = {argv[0], "-"};
     grep(2, argv_new, &flags);
   } else {
@@ -72,7 +69,7 @@ bool handle_pattern_file(Options *flags) {
   FILE *pattern_file = fopen(flags->pattern_file, "r");
   if (!pattern_file) {
     if (!flags->s) {
-      fprintf(stderr, "Error opening pattern file %s\n", flags->pattern_file);
+      fprintf(stderr, "s21_grep: %s: No such file or directory\n", flags->pattern_file);
     }
     return true;
   }
@@ -118,7 +115,7 @@ int process_file(const char *filename, regex_t *regex, Options *flags,
   FILE *file = fopen(filename, "r");
   if (!file) {
     if (!flags->s) {
-      fprintf(stderr, "Error opening file %s\n", filename);
+      fprintf(stderr, "s21_grep: %s: No such file or directory\n", filename);
     }
     return 1;
   }

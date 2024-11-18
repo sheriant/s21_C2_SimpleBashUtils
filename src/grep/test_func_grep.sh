@@ -5,10 +5,6 @@ FAIL=0
 COUNTER=0
 DIFF_RES=""
 
-GREEN='\033[32m'
-RED='\033[31m'
-RESET='\033[0m'
-
 declare -a tests=(
 "s test_0_grep.txt VAR"
 "for s21_grep.c s21_grep.h Makefile VAR"
@@ -56,10 +52,10 @@ testing()
     if [ "$DIFF_RES" == "Files test_s21_grep.log and test_sys_grep.log are identical" ]
     then
       (( SUCCESS++ ))
-      echo "\033[31m$FAIL\033[0m/\033[32m$SUCCESS\033[0m/$COUNTER \033[32msuccess\033[0m grep $t"
+      echo -e "\033[31m$FAIL\033[0m/\033[32m$SUCCESS\033[0m/$COUNTER \033[32msuccess\033[0m grep $t"
     else
       (( FAIL++ ))
-      echo "\033[31m$FAIL\033[0m/\033[32m$SUCCESS\033[0m/$COUNTER \033[31mfail\033[0m grep $t"
+      echo -e "\033[31m$FAIL\033[0m/\033[32m$SUCCESS\033[0m/$COUNTER \033[31mfail\033[0m grep $t"
     fi
     rm test_s21_grep.log test_sys_grep.log
 }
@@ -151,6 +147,6 @@ do
     done
 done
 
-echo "\033[31mFAIL: $FAIL\033[0m"
-echo "\033[32mSUCCESS: $SUCCESS\033[0m"
-echo "ALL: $COUNTER"
+echo -e "\033[31mFAIL: $FAIL\033[0m"
+echo -e "\033[32mSUCCESS: $SUCCESS\033[0m"
+echo -e "ALL: $COUNTER"
