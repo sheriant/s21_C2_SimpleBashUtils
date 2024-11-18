@@ -4,7 +4,7 @@
 # --------------------------------------------------------------------------Переменные
 SHELL := /bin/bash
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -std=c11 -pedantic -D_GNU_SOURCE
+CFLAGS = -Wall -Werror -Wextra -std=c11 -pedantic -D_POSIX_C_SOURCE=200809L
 LIBS = -lm -lncurses
 GIT_COMMIT := $(shell git log -1 --pretty=format:%h)
 S21GREP = ./s21_grep
@@ -138,8 +138,8 @@ push:
 # --------------------------------------------------------------------------Проверки памяти
 # CPP-check
 cpp:
-	@cppcheck --enable=all --std=c11 -D_POSIX_C_SOURCE=201709L \
-	--suppress=missingIncludeSystem --suppress=checkersReport --suppress=constParameter --suppress=constParameterPointer main.c main.h
+	@cppcheck --enable=all --std=c11 -D_POSIX_C_SOURCE=200809L \
+	--suppress=missingIncludeSystem --suppress=checkersReport --suppress=constParameter --suppress=constParameterPointer s21_grep.c s21_grep.h
 	@echo "Проверка CPP выполнена!"
 
 # Утечки leaks
@@ -148,4 +148,4 @@ leaks:
 
 # Утечки valgrind
 valgrind:
-	valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP)
+	valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP) -i test test_ptrn_grep.txt

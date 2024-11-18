@@ -9,22 +9,20 @@ int main(int argc, char *argv[]) {
             argv[0]);
     return 1;
   }
-
   if (optind == argc) {
-    // Если нет файлов для поиска, читаем из stdin
     char *argv_new[] = {argv[0], "-"};
     grep(2, argv_new, &flags);
   } else {
     grep(argc, argv, &flags);
   }
-
+  free(flags.pattern);
   return 0;
 }
 
 bool parser(int argc, char *argv[], Options *flags) {
   bool error_flag = false;
   int opt = 0;
-  while ((opt = getopt(argc, argv, "ivclnhsof:e:")) != -1 && !error_flag) {
+  while ((opt = getopt(argc, argv, "ivclnhsof:e:")) != -1) {
     switch (opt) {
       case 'i':
         flags->i = true;
@@ -52,121 +50,91 @@ bool parser(int argc, char *argv[], Options *flags) {
         break;
       case 'e':
         flags->e = true;
-        flags->pattern = optarg;
+        flags->pattern = strdup(optarg);
         break;
       case 'f':
         flags->f = true;
-        flags->pattern_file = optarg;
+        flags->pattern_file = strdup(optarg);
         break;
       default:
         error_flag = true;
         break;
     }
   }
-
-  if (flags->f) {
-    error_flag = handle_pattern_file(flags);
-  }
-
-  if (flags->pattern == NULL && optind < argc) {
-    flags->pattern = argv[optind++];
-  }
-
-  if (flags->pattern == NULL) {
-    error_flag = true;
-  }
-
+  if (flags->f && !error_flag) error_flag = handle_pattern_file(flags);
+  if (!flags->pattern && optind < argc) flags->pattern = strdup(argv[optind++]);
+  if (!flags->pattern) error_flag = true;
   return error_flag;
 }
 
 bool handle_pattern_file(Options *flags) {
   bool error_flag = false;
   FILE *pattern_file = fopen(flags->pattern_file, "r");
-  if (pattern_file) {
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read = getline(&line, &len, pattern_file);
-    if (read != -1) {
-      flags->pattern = strdup(line);
-      if (flags->pattern[strlen(flags->pattern) - 1] == '\n') {
-        flags->pattern[strlen(flags->pattern) - 1] = '\0';
-      }
-    } else {
+  if (!pattern_file) {
+    if (!flags->s) {
+      fprintf(stderr, "Error opening pattern file %s\n", flags->pattern_file);
+    }
+    return true;
+  }
+  char buffer[4096];
+  if (fgets(buffer, sizeof(buffer), pattern_file)) {
+    size_t len = strlen(buffer);
+    if (len > 0 && buffer[len - 1] == '\n') {
+      buffer[len - 1] = '\0';
+    }
+    flags->pattern = strdup(buffer);
+    if (!flags->pattern) {
       error_flag = true;
     }
-    free(line);
-    fclose(pattern_file);
   } else {
-    fprintf(stderr, "Error opening pattern file %s\n", flags->pattern_file);
     error_flag = true;
   }
+  fclose(pattern_file);
   return error_flag;
 }
 
 void grep(int argc, char *argv[], Options *flags) {
   regex_t regex;
-  int reti;
-  int exit_status = 0;
-
-  reti = regcomp(&regex, flags->pattern, flags->i ? REG_ICASE : 0);
-  if (reti == 0) {
-    int file_count = argc - optind;
-    for (int i = optind; i < argc && exit_status == 0; i++) {
-      exit_status = process_file(argv[i], &regex, flags, file_count);
-    }
-    regfree(&regex);
-  } else {
+  int reti = regcomp(&regex, flags->pattern, flags->i ? REG_ICASE : 0);
+  if (reti) {
     char msgbuf[100];
     regerror(reti, &regex, msgbuf, sizeof(msgbuf));
     fprintf(stderr, "Regex compilation failed: %s\n", msgbuf);
-    exit_status = 1;
+    exit(1);
   }
 
-  if (exit_status != 0) {
-    exit(exit_status);
+  int file_count = argc - optind;
+  for (int i = optind; i < argc; i++) {
+    if (process_file(argv[i], &regex, flags, file_count)) {
+      exit(1);
+    }
   }
+
+  regfree(&regex);
 }
 
 int process_file(const char *filename, regex_t *regex, Options *flags,
                  int file_count) {
   FILE *file = fopen(filename, "r");
-  if (file == NULL) {
+  if (!file) {
     if (!flags->s) {
       fprintf(stderr, "Error opening file %s\n", filename);
     }
     return 1;
   }
 
-  char *line = NULL;
-  size_t len = 0;
-  ssize_t read;
-  int line_number = 0;
-  int match_count = 0;
+  char buffer[4096];
+  int line_number = 0, match_count = 0;
   bool file_has_match = false;
 
-  while ((read = getline(&line, &len, file)) != -1) {
+  while (fgets(buffer, sizeof(buffer), file)) {
     line_number++;
-    int reti = regexec(regex, line, 0, NULL, 0);
-    bool line_matches =
-        (!reti && !flags->v) || (reti == REG_NOMATCH && flags->v);
-
-    if (line_matches) {
-      match_count++;
-      file_has_match = true;
-
-      if (!flags->c && !flags->l) {
-        if (!flags->h && file_count > 1) {
-          printf("%s:", filename);
-        }
-        if (flags->n) {
-          printf("%d:", line_number);
-        }
-        printf("%s", line);
-        if (line[strlen(line) - 1] != '\n') {
-          printf("\n");
-        }
-      }
+    size_t len = strlen(buffer);
+    if (len > 0 && buffer[len - 1] == '\n') {
+      buffer[len - 1] = '\0';
     }
+    process_line(buffer, line_number, filename, regex, flags, file_count,
+                 &match_count, &file_has_match);
   }
 
   if (flags->c) {
@@ -180,7 +148,50 @@ int process_file(const char *filename, regex_t *regex, Options *flags,
     printf("%s\n", filename);
   }
 
-  free(line);
   fclose(file);
   return 0;
+}
+
+void process_line(const char *line, int line_number, const char *filename,
+                  regex_t *regex, Options *flags, int file_count,
+                  int *match_count, bool *file_has_match) {
+  bool line_matches = match_line(line, regex, flags);
+
+  if (line_matches) {
+    (*match_count)++;
+    *file_has_match = true;
+
+    if (!flags->c && !flags->l) {
+      if (flags->o) {
+        print_matches_only(line, regex);
+      } else {
+        print_line(line, line_number, filename, flags, file_count);
+      }
+    }
+  }
+}
+
+bool match_line(const char *line, regex_t *regex, Options *flags) {
+  int reti = regexec(regex, line, 0, NULL, 0);
+  return (!reti && !flags->v) || (reti == REG_NOMATCH && flags->v);
+}
+
+void print_line(const char *line, int line_number, const char *filename,
+                Options *flags, int file_count) {
+  if (!flags->h && file_count > 1) {
+    printf("%s:", filename);
+  }
+  if (flags->n) {
+    printf("%d:", line_number);
+  }
+  printf("%s\n", line);
+}
+
+void print_matches_only(const char *line, regex_t *regex) {
+  regmatch_t match;
+  const char *ptr = line;
+  while (regexec(regex, ptr, 1, &match, 0) == 0) {
+    printf("%.*s\n", (int)(match.rm_eo - match.rm_so), ptr + match.rm_so);
+    ptr += match.rm_eo;
+  }
 }
