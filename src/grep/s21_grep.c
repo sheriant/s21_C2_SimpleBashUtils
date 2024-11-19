@@ -3,9 +3,7 @@
 int main(int argc, char *argv[]) {
   Options flags = {0};
   if (parser(argc, argv, &flags)) {
-    fprintf(stderr,
-            "Usage: %s [OPTION]... PATTERNS [FILE]...\n",
-            argv[0]);
+    fprintf(stderr, "Usage: %s [OPTION]... PATTERNS [FILE]...\n", argv[0]);
   } else if (optind == argc) {
     char *argv_new[] = {argv[0], "-"};
     grep(2, argv_new, &flags);
@@ -69,7 +67,8 @@ bool handle_pattern_file(Options *flags) {
   FILE *pattern_file = fopen(flags->pattern_file, "r");
   if (!pattern_file) {
     if (!flags->s) {
-      fprintf(stderr, "s21_grep: %s: No such file or directory\n", flags->pattern_file);
+      fprintf(stderr, "s21_grep: %s: No such file or directory\n",
+              flags->pattern_file);
     }
     return true;
   }
@@ -103,7 +102,8 @@ void grep(int argc, char *argv[], Options *flags) {
   int file_count = argc - optind;
   for (int i = optind; i < argc; i++) {
     if (process_file(argv[i], &regex, flags, file_count)) {
-      if (!flags->s) fprintf(stderr, "s21_grep: %s: No such file or directory\n", argv[i]);
+      if (!flags->s)
+        fprintf(stderr, "s21_grep: %s: No such file or directory\n", argv[i]);
     }
   }
   regfree(&regex);
