@@ -2,6 +2,8 @@
 
 int main(int argc, char *argv[]) {
   Options flags = {0};
+  flags.pattern = NULL;
+  flags.pattern_file = NULL;
   if (parser(argc, argv, &flags)) {
     fprintf(stderr, "Usage: %s [OPTION]... PATTERNS [FILE]...\n", argv[0]);
   } else if (optind == argc) {
@@ -11,6 +13,7 @@ int main(int argc, char *argv[]) {
     grep(argc, argv, &flags);
   }
   free(flags.pattern);
+  free(flags.pattern_file);
   return 0;
 }
 
@@ -72,14 +75,18 @@ bool handle_pattern_file(Options *flags) {
     }
     return true;
   }
+
   char buffer[4096];
   if (fgets(buffer, sizeof(buffer), pattern_file)) {
     size_t len = strlen(buffer);
     if (len > 0 && buffer[len - 1] == '\n') {
       buffer[len - 1] = '\0';
     }
-    flags->pattern = strdup(buffer);
-    if (!flags->pattern) {
+    char *new_pattern = strdup(buffer);
+    if (new_pattern) {
+      free(flags->pattern);
+      flags->pattern = new_pattern;
+    } else {
       error_flag = true;
     }
   } else {

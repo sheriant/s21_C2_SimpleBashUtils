@@ -8,7 +8,7 @@ CFLAGS = -Wall -Werror -Wextra -std=c11 -pedantic -D_POSIX_C_SOURCE=200809L
 LIBS = -lm -lncurses
 GIT_COMMIT := $(shell git log -1 --pretty=format:%h)
 S21GREP = ./s21_grep
-FILE = test_case_grep.txt
+FILE = test_ptrn_grep.txt
 
 # Цвета
 GREEN = \033[0;32m
@@ -37,84 +37,105 @@ rebuild_grep: clean_grep s21_grep
 
 
 
-# --------------------------------------------------------------------------Тесты 
+# --------------------------------------------------------------------------Тесты
 tests_grep: rebuild_grep
-	@echo "Running tests for s21_grep..."
+	@echo "Running tests for s21_grep with $(FILE)..."
+	@echo "=========================================="
 
-# Стандартный вывод
-	@echo -n "Test basic grep command: "
-	@-diff <($(S21GREP) $(FILE)) <(grep $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+# Базовые тесты с разными паттернами
+	@echo -n "Test basic grep (pattern 'test'): "
+	@-diff <($(S21GREP) "test" $(FILE)) <(grep "test" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# -b флаг (нумерует непустые строки)
-	@echo -n "Test -b flag: "
-	@-diff <($(S21GREP) -b $(FILE)) <(grep -b $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@echo -n "Test basic grep (pattern 'clean'): "
+	@-diff <($(S21GREP) "clean" $(FILE)) <(grep "clean" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# -e флаг (показывает непечатаемые символы, отображает $ в конце каждой строки)
-	@echo -n "Test -e flag: "
-	@-diff <($(S21GREP) -e $(FILE)) <(grep -e $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@echo -n "Test basic grep (pattern 'CLEAN'): "
+	@-diff <($(S21GREP) "CLEAN" $(FILE)) <(grep "CLEAN" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# -n флаг (нумерует все строки)
-	@echo -n "Test -n flag: "
-	@-diff <($(S21GREP) -n $(FILE)) <(grep -n $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+# Флаг -i (игнорирование регистра)
+	@echo -n "Test -i flag (case insensitive): "
+	@-diff <($(S21GREP) -i "clean" $(FILE)) <(grep -i "clean" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# -s флаг (сжимает пустые строки)
-	@echo -n "Test -s flag: "
-	@-diff <($(S21GREP) -s $(FILE)) <(grep -s $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+# Флаг -v (инвертирование поиска)
+	@echo -n "Test -v flag (invert match): "
+	@-diff <($(S21GREP) -v "test" $(FILE)) <(grep -v "test" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# -t флаг (Отображает табуляцию как ^I)
-	@echo -n "Test -t flag: "
-	@-diff <($(S21GREP) -t $(FILE)) <(grep -t $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+# Флаг -c (количество совпадений)
+	@echo -n "Test -c flag (count matches): "
+	@-diff <($(S21GREP) -c "test" $(FILE)) <(grep -c "test" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# --number флаг (эквивалент -n)
-	@echo -n "Test --number flag: "
-	@-diff <($(S21GREP) --number $(FILE)) <(grep -n $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+# Флаг -l (имена файлов)
+	@echo -n "Test -l flag (file names only): "
+	@-diff <($(S21GREP) -l "test" $(FILE)) <(grep -l "test" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# --squeeze-blank флаг (эквивалент to -s)
-	@echo -n "Test --squeeze-blank flag: "
-	@-diff <($(S21GREP) --squeeze-blank $(FILE)) <(grep -s $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+# Флаг -n (номера строк)
+	@echo -n "Test -n flag (line numbers): "
+	@-diff <($(S21GREP) -n "test" $(FILE)) <(grep -n "test" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# --number-nonblank флаг (эквивалент to -b)
-	@echo -n "Test --number-nonblank flag: "
-	@-diff <($(S21GREP) --number-nonblank $(FILE)) <(grep -b $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+# Флаг -h (без имен файлов)
+	@echo -n "Test -h flag (no file names): "
+	@-diff <($(S21GREP) -h "test" $(FILE)) <(grep -h "test" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# -etsnb флаг (Все флаги)
-	@echo -n "Test all flags: "
-	@-diff <($(S21GREP) -etsnb $(FILE)) <(grep -etsnb $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+# Флаг -s (подавление ошибок)
+	@echo -n "Test -s flag (suppress errors): "
+	@-diff <($(S21GREP) -s "test" nonexistent_file.txt $(FILE)) <(grep -s "test" nonexistent_file.txt $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-# Cppcheck + valgrind + style test
+# Флаг -o (только совпадения)
+	@echo -n "Test -o flag (only matching parts): "
+	@-diff <($(S21GREP) -o "clean" $(FILE)) <(grep -o "clean" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+# Флаг -e (явное указание паттерна)
+	@echo -n "Test -e flag (explicit pattern): "
+	@-diff <($(S21GREP) -e "test" $(FILE)) <(grep -e "test" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+# Флаг -f (паттерны из файла)
+	@echo -n "Test -f flag (patterns from file): "
+	@echo "test" > patterns.txt
+	@-diff <($(S21GREP) -f patterns.txt $(FILE)) <(grep -f patterns.txt $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@rm -f patterns.txt
+
+# Регулярные выражения (строка начинающаяся с #include)
+	@echo -n "Test regex pattern (^#include): "
+	@-diff <($(S21GREP) "^#include" $(FILE)) <(grep "^#include" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+# Комбинации флагов
+	@echo -n "Test combined flags (-in): "
+	@-diff <($(S21GREP) -in "clean" $(FILE)) <(grep -in "clean" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+	@echo -n "Test combined flags (-cv): "
+	@-diff <($(S21GREP) -cv "test" $(FILE)) <(grep -cv "test" $(FILE)) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+# Тесты с Valgrind (проверка утечек памяти)
+	@echo "=========================================="
+	@echo -n "Test Valgrind (basic pattern): "
+	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP) "test" $(FILE) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+	@echo -n "Test Valgrind (with flags -i -n): "
+	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP) -i -n "clean" $(FILE) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+	@echo -n "Test Valgrind (regex pattern): "
+	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP) "^#include" $(FILE) > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+
+# Статический анализ и стиль
+	@echo "=========================================="
 	@echo -n "Test Cppcheck: "
-	@cppcheck --enable=all --std=c11 -D_POSIX_C_SOURCE=201709L \
-	--suppress=missingIncludeSystem --suppress=checkersReport --suppress=constParameter --suppress=constParameterPointer main.c main.h \
+	@cppcheck --enable=all --std=c11 -D_POSIX_C_SOURCE=200809L \
+	--suppress=missingIncludeSystem --suppress=checkersReport --suppress=constParameter --suppress=constParameterPointer s21_grep.c s21_grep.h \
 	> /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
-	
-	@echo -n "Test Valgrind (empty): "
-	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP) > /dev/null 2>&1 \
-	&& echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
-	@echo -n "Test Valgrind (with flag -e): "
-	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP) -b test_case_grep.txt > /dev/null 2>&1 \
-	&& echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
-	@echo -n "Test Valgrind (with non-existent flag): "
-	@valgrind -s --trace-children=yes --track-fds=yes --track-origins=yes --leak-check=full --show-leak-kinds=all -q $(S21GREP) -o test_case_grep.txt > /dev/null 2>&1 \
-	&& echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
 
-	@echo -n "Test style: "
-	@cp ../../materials/linters/.clang-format .clang-format
-	@clang-format --Werror -n *.c > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
-	@rm -f .clang-format
+	@echo -n "Test code style: "
+	@clang-format -style=file:../../materials/linters/.clang-format -n --Werror *.[ch] > /dev/null 2>&1 && echo -e "$(GREEN)PASS$(NC)" || echo -e "$(RED)FAIL$(NC)"
+	@echo "=========================================="
+	@echo "All tests completed!"
 
 
 
 # --------------------------------------------------------------------------Полезные команды
 # Форматирование кода
 clang:
-	@cp ../../materials/linters/.clang-format .clang-format
-	@echo "Файл clang-format скопирован в папку grep."
-	@clang-format -n *.c
-	@echo "Проверка кода по Clang завершена."	
-	@clang-format -i *.c
-	@echo "Форматирование кода по Clang завершено."		
-	@rm -f .clang-format
-	@echo "Файл .clang-format удален из папки grep."
+	@echo "🔍 Format check..."
+	@clang-format -style=file:../../materials/linters/.clang-format -n --Werror *.[ch] >/dev/null 2>&1 && \
+		echo "✅ OK" || (echo "❌ Fixing..." && clang-format -style=file:../../materials/linters/.clang-format -i *.[ch] && echo "🎉 Done")
 
 # Конфиг пользователя
 config:
